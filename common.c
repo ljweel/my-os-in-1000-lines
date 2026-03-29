@@ -1,3 +1,6 @@
+/*
+    5. 헬로 월드
+*/
 #include "common.h"
 
 void putchar(char ch);

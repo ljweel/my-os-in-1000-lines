@@ -1,16 +1,27 @@
 #pragma once
 
+/*
+    5. 헬로월드
+*/
 struct sbiret {
     long error;
     long value;
 };
 
+/*
+    7. 커널 패닉
+*/
 #define PANIC(fmt, ...)                                                        \
     do {                                                                       \
         printf("PANIC: %s:%d: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__);  \
         while (1) {}                                                           \
     } while (0)
 
+
+
+/*
+    8. 예외
+*/
 #include "common.h"
 
 struct trap_frame {
