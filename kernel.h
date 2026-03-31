@@ -70,3 +70,14 @@ struct trap_frame {
         uint32_t __tmp = (value);                                              \
         __asm__ __volatile__("csrw " #reg ", %0" ::"r"(__tmp));                \
     } while (0)
+
+
+/*
+    11. 페이지 테이블
+*/
+#define SATP_SV32 (1u << 31)
+#define PAGE_V    (1 << 0)   // "Valid" 비트 (엔트리가 유효함을 의미)
+#define PAGE_R    (1 << 1)   // 읽기 가능
+#define PAGE_W    (1 << 2)   // 쓰기 가능
+#define PAGE_X    (1 << 3)   // 실행 가능
+#define PAGE_U    (1 << 4)   // 사용자 모드 접근 가능
