@@ -87,3 +87,9 @@ struct trap_frame {
 */
 #define USER_BASE 0x1000000  // user.ld의 베이스 주소와 일치해야 함
 #define SSTATUS_SPIE (1 << 5)
+
+/*
+    14. 시스템 콜
+*/
+#define SCAUSE_ECALL 8
+#define PROC_EXITED   2
