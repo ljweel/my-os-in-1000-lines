@@ -81,3 +81,9 @@ struct trap_frame {
 #define PAGE_W    (1 << 2)   // 쓰기 가능
 #define PAGE_X    (1 << 3)   // 실행 가능
 #define PAGE_U    (1 << 4)   // 사용자 모드 접근 가능
+
+/*
+    13. 유저 모드
+*/
+#define USER_BASE 0x1000000  // user.ld의 베이스 주소와 일치해야 함
+#define SSTATUS_SPIE (1 << 5)
