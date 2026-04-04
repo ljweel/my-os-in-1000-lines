@@ -93,3 +93,72 @@ struct trap_frame {
 */
 #define SCAUSE_ECALL 8
 #define PROC_EXITED   2
+/*
+    15. 디스크 I/O
+*/
+#define SECTOR_SIZE       512
+#define VIRTQ_ENTRY_NUM   16
+#define VIRTIO_DEVICE_BLK 2
+#define VIRTIO_BLK_PADDR  0x10001000
+#define VIRTIO_REG_MAGIC         0x00
+#define VIRTIO_REG_VERSION       0x04
+#define VIRTIO_REG_DEVICE_ID     0x08
+#define VIRTIO_REG_PAGE_SIZE     0x28
+#define VIRTIO_REG_QUEUE_SEL     0x30
+#define VIRTIO_REG_QUEUE_NUM_MAX 0x34
+#define VIRTIO_REG_QUEUE_NUM     0x38
+#define VIRTIO_REG_QUEUE_PFN     0x40
+#define VIRTIO_REG_QUEUE_READY   0x44
+#define VIRTIO_REG_QUEUE_NOTIFY  0x50
+#define VIRTIO_REG_DEVICE_STATUS 0x70
+#define VIRTIO_REG_DEVICE_CONFIG 0x100
+#define VIRTIO_STATUS_ACK       1
+#define VIRTIO_STATUS_DRIVER    2
+#define VIRTIO_STATUS_DRIVER_OK 4
+#define VIRTQ_DESC_F_NEXT          1
+#define VIRTQ_DESC_F_WRITE         2
+#define VIRTQ_AVAIL_F_NO_INTERRUPT 1
+#define VIRTIO_BLK_T_IN  0
+#define VIRTIO_BLK_T_OUT 1
+
+struct virtq_desc {
+    uint64_t addr;    // 데이터가 있는 물리 주소
+    uint32_t len;     // 데이터 크기
+    uint16_t flags;   // NEXT, WRITE 등
+    uint16_t next;    // 체인의 다음 디스크립터 인덱스
+} __attribute__((packed));
+
+struct virtq_avail {
+    uint16_t flags;                    // 인터럽트 제어 플래그
+    uint16_t index;                    // 다음에 쓸 위치
+    uint16_t ring[VIRTQ_ENTRY_NUM];    // 디스크립터 헤드 인덱스 배열
+} __attribute__((packed));
+
+struct virtq_used_elem {
+    uint32_t id;     // 처리한 디스크립터 체인의 헤드 인덱스
+    uint32_t len;    // 장치가 실제로 쓴 바이트 수
+} __attribute__((packed));
+
+struct virtq_used {
+    uint16_t flags;
+    uint16_t index;                              // 장치가 다음에 쓸 위치
+    struct virtq_used_elem ring[VIRTQ_ENTRY_NUM];
+} __attribute__((packed));
+
+struct virtio_virtq {
+    struct virtq_desc descs[VIRTQ_ENTRY_NUM];   // 디스크립터 테이블
+    struct virtq_avail avail;                    // Available Ring
+    struct virtq_used used __attribute__((aligned(PAGE_SIZE)));  // Used Ring (페이지 정렬 필요)
+    int queue_index;                             // 이 큐의 번호
+    volatile uint16_t *used_index;               // used.index를 가리키는 포인터
+    uint16_t last_used_index;                    // 드라이버가 마지막으로 확인한 used index
+} __attribute__((packed));
+
+struct virtio_blk_req {
+    uint32_t type;       // 요청 타입 (IN=읽기, OUT=쓰기)
+    uint32_t reserved;   // 사양에서 예약된 필드 (0)
+    uint64_t sector;     // 접근할 섹터 번호
+    uint8_t data[512];   // 읽기/쓰기할 데이터 (1섹터 = 512바이트)
+    uint8_t status;      // 장치가 기록하는 처리 결과 (0=성공)
+} __attribute__((packed));
+
