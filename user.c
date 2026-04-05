@@ -1,7 +1,7 @@
 #include "user.h"
 
 /*
-    12. 애플리케이션 + 14. 시스템 콜
+    12. 애플리케이션 + 14. 시스템 콜 + 16. 파일 시스템
 */
 extern char __stack_top[];
 
@@ -17,6 +17,15 @@ int getchar(void) {
 void putchar(char ch) {
     syscall(SYS_PUTCHAR, ch, 0, 0);
 }
+
+int readfile(const char *filename, char *buf, int len) {
+    return syscall(SYS_READFILE, (int) filename, (int) buf, len);
+}
+
+int writefile(const char *filename, const char *buf, int len) {
+    return syscall(SYS_WRITEFILE, (int) filename, (int) buf, len);
+}
+
 
 int syscall(int sysno, int arg0, int arg1, int arg2) {
     register int a0 __asm__("a0") = arg0;
